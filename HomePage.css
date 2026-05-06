@@ -1,0 +1,88 @@
+.nav-item:hover {
+    color: black;
+    text-decoration: underline;
+}
+
+body {
+    padding-top: 5%;
+}
+
+#user-name, #recent-goal {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+canvas {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.chart-container {
+    height: 300px; /* Set a fixed height for the charts */
+    padding-top: 3%;
+}
+
+/* Custom CSS for the Calendar */
+.fc-toolbar-title {
+    color: black;
+}
+
+.popup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #28a745;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    z-index: 1050;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.popup.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.goal-container {
+    padding-top: 5%;
+    border-radius: 10px;
+}
+
+.goal-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.progress-circle {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: conic-gradient(#007bff var(--progress), #e9ecef 0);
+}
+
+.progress-circle::before {
+    content: attr(data-progress) '%';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2em;
+    color: #007bff;
+}
+
+#recent-goal {
+    color: black;
+    text-decoration: none;
+}

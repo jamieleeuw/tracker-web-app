@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker - Login</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="icon" type="image/x-icon" href="Images/dumbbell-logo.png"/>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+     <style>
+        body {
+            background-image: url(Images/OIP.jpeg);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-light d-flex justify-content-center align-items-center" style="height: 100vh;">
+
+    <div class="container">
+        <div id="hero">
+            <h1>Welcome to Vital Trak</h1>
+            <p>Track your workouts and achieve your fitness goals!</p>
+        </div>        
+        <form id="loginForm">
+            <div class="mb-3" id="hero">
+                <label for="name" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="name" required>
+            </div>
+            <div class="mb-3" id="hero">
+                <label for="surname" class="form-label">Surname</label>
+                <input type="text" class="form-control" id="surname" required>
+            </div>
+            <div class="mb-3" id="hero">
+                <label for="email" class="form-label">Gmail</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Save user info to localStorage
+            localStorage.setItem("userName", document.getElementById('name').value);
+            localStorage.setItem("userSurname", document.getElementById('surname').value);
+            localStorage.setItem("userEmail", document.getElementById('email').value);
+            window.location.href = "HomePage.html";  // Redirect to home page
+        });
+    </script>
+
+</body>
+</html>
