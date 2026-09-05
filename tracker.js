@@ -482,11 +482,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.getElementById("goal-list")) {
         updateGoalList();
     }
-
-    // Initiate The Page
-    if (document.getElementById("goal-list")) {
-        updateGoalList();
-    }
     if (document.getElementById("workout-log")) {
         renderWorkoutLog();
     }
