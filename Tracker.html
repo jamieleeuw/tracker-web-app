@@ -8,6 +8,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="Images/dumbbell-logo.png"/>
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="tracker.css">
 </head>
 
@@ -15,11 +16,11 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-primary fixed-top">
             <div class="container-fluid">
-                <a class="navbar-brand">
+                <a class="navbar-brand" href="HomePage.html">
                     <img src="Images/dumbbell-logo.png" alt="dumbbell-logo" width="30" height="24"> 
                     Vital Trak
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
@@ -36,16 +37,23 @@
 
     <main class="text-light mt-5">
         <div class="container mt-4">
-            <h1 class="text-center">Fitness Tracker</h1>
+            <div class="page-intro"><p class="eyebrow">YOUR ACTIVITY</p><h1>Fitness Tracker</h1><p>Log sessions, follow your progress and keep your next goal in sight.</p></div>
+
+            <section class="summary-grid" aria-label="Workout summary">
+                <div class="summary-card"><span>Total workouts</span><strong id="summary-workouts">0</strong></div>
+                <div class="summary-card"><span>Calories burned</span><strong id="summary-calories">0</strong></div>
+                <div class="summary-card"><span>Cardio distance</span><strong id="summary-distance">0 km</strong></div>
+                <div class="summary-card"><span>Best streak</span><strong id="summary-streak">0 days</strong></div>
+            </section>
 
             <div class="row">
                 <!-- Workout Logger -->
                 <div class="col-md-8">
                     <div class="card p-3 mt-3">
-                        <h3>Log Your Workout</h3>
+                        <h2>Log your workout</h2>
                         
                         <!-- Select The Type of Workout-->
-                        <label for="workout-type">Workout Type:</label>
+                        <form id="workout-form" novalidate><label for="workout-type">Workout type</label>
                         <select id="workout-type" class="form-select">
                             <option value="">--Select an option--</option>
                             <option value="Running">Running</option>
@@ -77,9 +85,9 @@
                         <label for="date-input">Date:</label>
                         <input type="date" id="date-input" class="form-control" required>
                         
-                        <button class="btn btn-primary mt-2" id="log-workout">Log Workout</button>
+                        <button type="button" class="btn btn-primary mt-2" id="log-workout">Log workout</button></form>
                         
-                        <h3 class="mt-3">Workout history</h3>
+                        <div class="history-heading"><div><h2 class="mt-3">Workout history</h2><p class="muted">Your most recent sessions appear first.</p></div><div class="history-controls"><label class="visually-hidden" for="workout-search">Search workouts</label><input id="workout-search" class="form-control" type="search" placeholder="Search workouts"><label class="visually-hidden" for="workout-sort">Sort workouts</label><select id="workout-sort" class="form-select"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></div></div>
                         <div id="workout-log"></div>
                         <!-- Logged Workouts List-->
                     </div>
@@ -88,7 +96,7 @@
                 <!-- Goal Setter -->
                 <div class="col-md-4">
                     <div class="card p-3 mt-3">
-                        <h3>Set Your Goals</h3>
+                        <h2>Set your goals</h2>
 
                         <!-- Select a Exercise Type for the goal-->
                         <label for="goal-exercise">Exercise type:</label>
@@ -113,10 +121,28 @@
 
                         <button class="btn btn-success mt-2" id="add-goal">Add Goal</button>
 
-                        <h4 class="mt-3">Your Goals</h4>
+                        <h3 class="mt-3">Your goals</h3>
                         <div id="goal-list"></div>
                         <!-- Goal List Section-->
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit goal modal -->
+        <div class="modal fade" id="editGoalModal" tabindex="-1" aria-labelledby="editGoalModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header"><h5 class="modal-title" id="editGoalModalLabel">Edit goal</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                    <div class="modal-body">
+                        <label for="edit-goal-exercise">Exercise type</label>
+                        <select id="edit-goal-exercise" class="form-select"></select>
+                        <label for="edit-goal-type">Goal type</label>
+                        <select id="edit-goal-type" class="form-select"></select>
+                        <label for="edit-goal-value">Goal value</label>
+                        <input type="number" min="0.01" step="any" id="edit-goal-value" class="form-control">
+                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="save-goal-edit">Save changes</button></div>
                 </div>
             </div>
         </div>

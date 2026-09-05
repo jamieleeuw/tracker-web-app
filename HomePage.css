@@ -95,6 +95,7 @@ canvas {
     width: 100px;
     height: 100px;
     border-radius: 50%;
+    --progress: 0%;
     background: conic-gradient(#007bff var(--progress), #e9ecef 0);
 }
 

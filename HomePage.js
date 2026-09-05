@@ -10,7 +10,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (goals.length > 0) {
         const recentGoal = goals[goals.length - 1];
         document.getElementById("recent-goal").innerText = `Recent Goal: ${recentGoal.exerciseType} - ${recentGoal.goalType} (${recentGoal.goalValue})`;
-        updateGoalProgress(recentGoal);
+        const relevant = (JSON.parse(localStorage.getItem("workoutLog")) || []).filter(workout => workout.type === recentGoal.exerciseType);
+        const current = relevant.reduce((sum, workout) => sum + (recentGoal.goalType === "Distance" ? Number(workout.distance) || 0 : recentGoal.goalType === "Weight" ? Number(workout.weight) || 0 : Number(workout.calories) || 0), 0);
+        updateGoalProgress(recentGoal, current);
     }
 
     // Generate charts
@@ -43,13 +45,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const caloriesCtx = document.getElementById('calories-burned-chart').getContext('2d');
+    const caloriesByType = workoutLog.reduce((totals, workout) => { totals[workout.type] = (totals[workout.type] || 0) + (Number(workout.calories) || 0); return totals; }, {});
     const caloriesBurnedChart = new Chart(caloriesCtx, {
         type: 'doughnut',
         data: {
-            labels: [], // Empty labels initially
+            labels: Object.keys(caloriesByType),
             datasets: [{
                 label: 'Calories Burned',
-                data: [], // Empty data initially
+                data: Object.values(caloriesByType),
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -76,13 +79,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const durationCtx = document.getElementById('average-workout-duration-chart').getContext('2d');
+    const durationByType = workoutLog.reduce((totals, workout) => { const type = workout.type || "Workout"; totals[type] ||= []; totals[type].push(Number(workout.duration) || 0); return totals; }, {});
     const averageWorkoutDurationChart = new Chart(durationCtx, {
         type: 'bar',
         data: {
-            labels: [], // Empty labels initially
+            labels: Object.keys(durationByType),
             datasets: [{
                 label: 'Average Workout Duration (minutes)',
-                data: [], // Empty data initially
+                data: Object.values(durationByType).map(values => values.reduce((sum, value) => sum + value, 0) / values.length),
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1
@@ -126,35 +130,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   
     // Load existing workout data into the charts
-    workoutLog.forEach(workout => {
-        updateCalorieChart(workout.date, workout.calories);
-        updateAverageWorkoutDurationChart(workout.date, workout.duration);
-    });
+    // Charts are aggregated by workout type so repeated sessions remain accurate.
 
     // Function to update the calorie chart
-    function updateCalorieChart(date, calories) {
-        const index = caloriesBurnedChart.data.labels.indexOf(date);
+    function updateCalorieChart(type, calories) {
+        const index = caloriesBurnedChart.data.labels.indexOf(type);
         if (index === -1) {
-            // If the date is not in the labels, add it
-            caloriesBurnedChart.data.labels.push(date);
+            caloriesBurnedChart.data.labels.push(type);
             caloriesBurnedChart.data.datasets[0].data.push(calories);
         } else {
-            // If the date is already in the labels, update the calories
-            caloriesBurnedChart.data.datasets[0].data[index] = calories;
+            caloriesBurnedChart.data.datasets[0].data[index] += Number(calories) || 0;
         }
         caloriesBurnedChart.update();
     }
 
     // Function to update the average workout duration chart
-    function updateAverageWorkoutDurationChart(date, duration) {
-        const index = averageWorkoutDurationChart.data.labels.indexOf(date);
+    function updateAverageWorkoutDurationChart(type, duration) {
+        const index = averageWorkoutDurationChart.data.labels.indexOf(type);
         if (index === -1) {
-            // If the date is not in the labels, add it
-            averageWorkoutDurationChart.data.labels.push(date);
+            averageWorkoutDurationChart.data.labels.push(type);
             averageWorkoutDurationChart.data.datasets[0].data.push(duration);
         } else {
-            // If the date is already in the labels, update the duration
-            averageWorkoutDurationChart.data.datasets[0].data[index] = duration;
+            const durations = workoutLog.filter(workout => workout.type === type).map(workout => Number(workout.duration) || 0);
+            averageWorkoutDurationChart.data.datasets[0].data[index] = durations.reduce((sum, value) => sum + value, 0) / durations.length;
         }
         averageWorkoutDurationChart.update();
     }
@@ -178,10 +176,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Function to update the goal progress
-    function updateGoalProgress(goal) {
+    function updateGoalProgress(goal, currentValue = 0) {
         const progressElement = document.getElementById('goal-progress');
-        const currentValue = goal.currentValue || 0; // Ensure currentValue is defined
-        const progress = Math.min((currentValue / goal.goalValue) * 100, 100);
+        const progress = Math.min((currentValue / Number(goal.goalValue)) * 100, 100);
         progressElement.style.setProperty('--progress', `${progress}%`);
         progressElement.setAttribute('data-progress', Math.round(progress));
     }
@@ -196,17 +193,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const workoutDuration = parseInt(document.getElementById('workoutDuration').value, 10) || 0;
         const workoutDate = document.getElementById("workoutDate").value;
 
+        if (!workoutType || !workoutDate || !Number.isFinite(workoutCalories) || workoutCalories <= 0) {
+            showPopup("Please enter a workout type, date and calories burned.");
+            return;
+        }
+
         // Add the new workout to the workout log
         const newWorkout = { type: workoutType, distance: workoutDistance, weight: workoutWeight, calories: workoutCalories, duration: workoutDuration, date: workoutDate };
         workoutLog.push(newWorkout);
         localStorage.setItem('workoutLog', JSON.stringify(workoutLog));
 
-        // Update the calorie chart with the new data
-        updateCalorieChart(workoutDate, workoutCalories);
+        updateCalorieChart(workoutType, workoutCalories);
         updateWorkoutCountsChart(workoutType);
-
-        // Update the average workout duration chart with the new data
-        updateAverageWorkoutDurationChart(workoutDate, workoutDuration);
+        updateAverageWorkoutDurationChart(workoutType, workoutDuration);
 
         // Add event to the calendar
         if (calendar) {
@@ -222,8 +221,7 @@ document.addEventListener("DOMContentLoaded", function () {
         homeDistanceGroup.hidden = true;
         homeWeightGroup.hidden = true;
         // Close the modal
-        const logWorkoutModal = new bootstrap.Modal(document.getElementById('logWorkoutModal'));
-        logWorkoutModal.hide();
+        bootstrap.Modal.getInstance(document.getElementById('logWorkoutModal'))?.hide();
         showPopup(`Workout logged: ${workoutType} - ${workoutCalories} cal on ${workoutDate}`);
     });
 

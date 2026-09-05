@@ -1,3 +1,10 @@
-body {
-    padding-top: 6%;
-}
+main { padding-top: 1rem; }
+.achievement-intro { max-width: 680px; margin: 1.5rem auto 2rem; }
+.achievement-intro h1 { font-weight: 800; font-size: clamp(2rem, 4vw, 3rem); }
+#achievements-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.achievement-card { display: flex; gap: 1rem; align-items: flex-start; padding: 1.25rem; color: #172033; background: #f8fafc; border: 1px solid #dbe4ee; border-radius: 16px; box-shadow: 0 12px 28px rgba(0,0,0,.16); }
+.achievement-icon { display: grid; place-items: center; width: 52px; height: 52px; flex: 0 0 52px; border-radius: 14px; background: #e8f3f3; font-size: 1.6rem; }
+.achievement-content { min-width: 0; flex: 1; } .achievement-heading { display: flex; justify-content: space-between; gap: .5rem; align-items: start; } .achievement-heading h2 { font-size: 1.1rem; margin: 0; font-weight: 750; }
+.achievement-card p { color: #64748b; margin: .4rem 0 .9rem; } .achievement-status { white-space: nowrap; font-size: .75rem; font-weight: 750; color: #64748b; } .unlocked { border-color: #76c6a1; } .unlocked .achievement-status { color: #198754; } .unlocked .achievement-icon { background: #dff5e9; } .locked .achievement-icon { filter: grayscale(1); opacity: .7; }
+.achievement-card small { color: #64748b; display: block; margin-top: .4rem; }
+@media (max-width: 700px) { #achievements-list { grid-template-columns: 1fr; } }

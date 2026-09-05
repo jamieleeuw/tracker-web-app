@@ -34,9 +34,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     <img src="${workout.img}" class="card-img-top" alt="${workout.name}">
                     <div class="card-body text-center">
                         <h5 class="card-title">${workout.name}</h5>
-                        <button class="btn btn-primary view-video" data-video="${workout.video}" data-name="${workout.name}">▶️ Watch</button>
+                        <button class="btn btn-primary view-video" data-video="${workout.video}" data-name="${workout.name}">Watch tutorial</button>
                         <button class="btn btn-sm favorite-btn ${isFavorite ? 'btn-danger' : 'btn-outline-danger'}" data-name="${workout.name}">
-                            ${isFavorite ? "❤️" : "🤍"}
+                            ${isFavorite ? "Favorited" : "Favorite"}
                         </button>
                     </div>
                 </div>
