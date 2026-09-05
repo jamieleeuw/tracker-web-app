@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Display user name and surname
     const userName = localStorage.getItem("userName");
     const userSurname = localStorage.getItem("userSurname");
-    document.getElementById("user-name").innerText = `Hello, ${userName} ${userSurname}`;
+    document.getElementById("user-name").innerText = `Hello, ${userName || "there"} ${userSurname || ""}`.trim();
 
     // Display the most recent goal
     const goals = JSON.parse(localStorage.getItem("goals")) || [];
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }, {});
 
     const workoutCountsChartCtx = document.getElementById("workout-counts-chart").getContext("2d");
-    new Chart(workoutCountsChartCtx, {
+    const workoutCountsChart = new Chart(workoutCountsChartCtx, {
         type: 'bar',
         data: {
             labels: Object.keys(workoutCounts),
@@ -96,6 +96,34 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     });
+
+    const calendarElement = document.getElementById("workout-calendar");
+    const calendar = calendarElement && typeof FullCalendar !== "undefined"
+        ? new FullCalendar.Calendar(calendarElement, {
+            initialView: "dayGridMonth",
+            height: "auto",
+            events: workoutLog.map(workout => ({
+                title: `${workout.type} - ${workout.calories || 0} cal`,
+                start: normalizeDate(workout.date)
+            })).filter(event => event.start)
+        })
+        : null;
+
+    if (calendar) {
+        calendar.render();
+    }
+
+    const homeWorkoutType = document.getElementById("home-workout-type");
+    const homeDistanceGroup = document.getElementById("home-distance-group");
+    const homeWeightGroup = document.getElementById("home-weight-group");
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("workoutDate").value = today;
+
+    homeWorkoutType.addEventListener("change", function () {
+        const cardio = ["Running", "Swimming", "Cycling"].includes(this.value);
+        homeDistanceGroup.hidden = !cardio;
+        homeWeightGroup.hidden = this.value !== "Strength";
+    });
   
     // Load existing workout data into the charts
     workoutLog.forEach(workout => {
@@ -131,6 +159,24 @@ document.addEventListener("DOMContentLoaded", function () {
         averageWorkoutDurationChart.update();
     }
 
+    function normalizeDate(date) {
+        if (!date) return null;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+        const parsed = new Date(date);
+        return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString().split("T")[0];
+    }
+
+    function updateWorkoutCountsChart(type) {
+        const index = workoutCountsChart.data.labels.indexOf(type);
+        if (index === -1) {
+            workoutCountsChart.data.labels.push(type);
+            workoutCountsChart.data.datasets[0].data.push(1);
+        } else {
+            workoutCountsChart.data.datasets[0].data[index] += 1;
+        }
+        workoutCountsChart.update();
+    }
+
     // Function to update the goal progress
     function updateGoalProgress(goal) {
         const progressElement = document.getElementById('goal-progress');
@@ -143,30 +189,38 @@ document.addEventListener("DOMContentLoaded", function () {
     // Handle form submission for logging workouts
     document.getElementById('logWorkoutForm').addEventListener('submit', function(event) {
         event.preventDefault();
-        const workoutType = document.getElementById('workoutType').value;
-        const workoutCalories = parseInt(document.getElementById('workoutCalories').value);
-        const workoutDuration = parseInt(document.getElementById('workoutDuration').value);
-        const workoutDate = new Date().toLocaleDateString(); // Use current date for simplicity
+        const workoutType = homeWorkoutType.value;
+        const workoutDistance = parseFloat(document.getElementById("home-distance").value) || 0;
+        const workoutWeight = parseFloat(document.getElementById("home-weight").value) || 0;
+        const workoutCalories = parseInt(document.getElementById('workoutCalories').value, 10);
+        const workoutDuration = parseInt(document.getElementById('workoutDuration').value, 10) || 0;
+        const workoutDate = document.getElementById("workoutDate").value;
 
         // Add the new workout to the workout log
-        const newWorkout = { type: workoutType, calories: workoutCalories, duration: workoutDuration, date: workoutDate };
+        const newWorkout = { type: workoutType, distance: workoutDistance, weight: workoutWeight, calories: workoutCalories, duration: workoutDuration, date: workoutDate };
         workoutLog.push(newWorkout);
         localStorage.setItem('workoutLog', JSON.stringify(workoutLog));
 
         // Update the calorie chart with the new data
         updateCalorieChart(workoutDate, workoutCalories);
+        updateWorkoutCountsChart(workoutType);
 
         // Update the average workout duration chart with the new data
         updateAverageWorkoutDurationChart(workoutDate, workoutDuration);
 
         // Add event to the calendar
-        calendar.addEvent({
-            title: `${workoutType} - ${workoutCalories} cal`,
-            start: workoutDate
-        });
+        if (calendar) {
+            calendar.addEvent({
+                title: `${workoutType} - ${workoutCalories} cal`,
+                start: workoutDate
+            });
+        }
 
         // Reset the form
         document.getElementById('logWorkoutForm').reset();
+        document.getElementById("workoutDate").value = today;
+        homeDistanceGroup.hidden = true;
+        homeWeightGroup.hidden = true;
         // Close the modal
         const logWorkoutModal = new bootstrap.Modal(document.getElementById('logWorkoutModal'));
         logWorkoutModal.hide();

@@ -74,11 +74,16 @@
         </header>
 
         <main class="container mt-4 text-light">
-            <div class="row">
-                <div class="col-md-6">
-                    <h2 id="user-name"></h2>
+            <section class="welcome-panel">
+                <div>
+                    <p class="eyebrow mb-2">YOUR FITNESS OVERVIEW</p>
+                    <h1 id="user-name" class="mb-2"></h1>
+                    <p class="welcome-copy mb-0">Keep your momentum going with a clear view of every session.</p>
                 </div>
-            </div>
+                <button type="button" class="btn btn-primary btn-lg log-workout-trigger" data-bs-toggle="modal" data-bs-target="#logWorkoutModal">
+                    <span aria-hidden="true">+</span> Log Workout
+                </button>
+            </section>
             <div class="row mt-4">
                 <div class="col-md-6 chart-container">
                     <h3>Workout Counts</h3>
@@ -100,6 +105,17 @@
                         <h2 id="recent-goal">Most Recent Goal</h2>
                     </div>
                 </div>
+            </div>
+            <section class="calendar-section mt-4">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow mb-1">ACTIVITY</p>
+                        <h2 class="mb-0">Workout calendar</h2>
+                    </div>
+                    <span class="section-note">Your logged sessions</span>
+                </div>
+                <div id="workout-calendar" aria-label="Workout calendar"></div>
+            </section>
         </main>
 
         <!-- Modal for logging workouts -->
@@ -113,18 +129,35 @@
                     <div class="modal-body">
                         <form id="logWorkoutForm">
                             <div class="mb-3">
-                                <label for="workoutType" class="form-label">Workout Type</label>
-                                <input type="text" class="form-control" id="workoutType" required>
+                                <label for="home-workout-type" class="form-label">Workout Type</label>
+                                <select class="form-select" id="home-workout-type" required>
+                                    <option value="">--Select an option--</option>
+                                    <option value="Running">Running</option>
+                                    <option value="Swimming">Swimming</option>
+                                    <option value="Cycling">Cycling</option>
+                                    <option value="Strength">Strength</option>
+                                </select>
+                            </div>
+                            <div class="mb-3" id="home-distance-group" hidden>
+                                <label for="home-distance" class="form-label">Distance (KM)</label>
+                                <input type="number" min="0" step="any" class="form-control" id="home-distance" placeholder="Enter distance">
+                            </div>
+                            <div class="mb-3" id="home-weight-group" hidden>
+                                <label for="home-weight" class="form-label">Weight (KG)</label>
+                                <input type="number" min="0" step="any" class="form-control" id="home-weight" placeholder="Enter weight lifted">
                             </div>
                             <div class="mb-3">
                                 <label for="workoutCalories" class="form-label">Calories Burned</label>
-                                <input type="number" class="form-control" id="workoutCalories" required>
+                                <input type="number" min="1" class="form-control" id="workoutCalories" required>
                             </div>
                             <div class="mb-3">
                                 <label for="workoutDuration" class="form-label">Workout Duration (minutes)</label>
-                                <input type="number" class="form-control" id="workoutDuration" required>
+                                <input type="number" min="0" class="form-control" id="workoutDuration" required>
                             </div>
-                            <input type="hidden" id="workoutDate">
+                            <div class="mb-3">
+                                <label for="workoutDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="workoutDate" required>
+                            </div>
                             <button type="submit" class="btn btn-primary">Log Workout</button>
                         </form>
                     </div>

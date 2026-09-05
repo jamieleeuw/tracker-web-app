@@ -21,18 +21,21 @@
 }
 
 .workout-card {
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, .12);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .workout-card:hover {
-    transform: scale(1.05);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 30px rgba(15, 23, 42, .18);
 }
-
 .card-img-top {
-    height: 200px;
+    height: 210px;
     object-fit: cover;
+    object-position: center;
 }
 
 .favorite-btn {
@@ -80,3 +83,7 @@ main{
     color: black;
     text-decoration: underline;
 }
+
+.workout-card .card-body { padding: 1.25rem; }
+.workout-card .card-title { font-weight: 700; margin-bottom: 1rem; }
+.workout-card .btn { border-radius: 999px; }
